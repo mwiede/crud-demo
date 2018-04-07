@@ -1,0 +1,173 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+<body>
+
+<ui:composition template="./WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <h:form id="form">
+            <p:growl id="msgs" showDetail="true"/>
+
+            <p:dataTable var="customer" value="#{dtFilterView.customers}" widgetVar="customersTable"
+                         emptyMessage="No customers found with given criteria"
+                         filteredValue="#{dtFilterView.filteredCustomers}"
+                         selectionMode="single" rowKey="#{customer.id}"
+                         scrollable="true" scrollHeight="200"
+                         editable="true"
+                         editMode="cell">
+
+                <!-- push to child table -->
+                <p:ajax event="rowSelect" listener="#{dtFilterView.onRowSelect}" update="@form"/>
+
+                <p:ajax event="cellEdit" listener="#{dtFilterView.onStatusEdit}" update=":form:msgs"/>
+
+                <f:facet name="header">
+                    <p:outputPanel>
+                        <h:outputText value="Search all fields:"/>
+                        <p:inputText id="globalFilter" onkeyup="PF('customersTable').filter()" style="width:150px"
+                                     placeholder="Enter keyword"/>
+                    </p:outputPanel>
+                </f:facet>
+
+                <p:column filterBy="#{customer.id}" sortBy="#{customer.id}" headerText="Id" footerText="contains"
+                          filterMatchMode="contains">
+                    <h:outputText value="#{customer.id}"/>
+                </p:column>
+
+                <p:column filterBy="#{customer.name}" sortBy="#{customer.name}" headerText="Name" footerText="contains"
+                          filterMatchMode="contains">
+                    <h:outputText value="#{customer.name}"/>
+                </p:column>
+                <p:column filterBy="#{customer.surname}" sortBy="#{customer.surname}" headerText="Surname"
+                          footerText="contains"
+                          filterMatchMode="contains">
+                    <h:outputText value="#{customer.surname}"/>
+                </p:column>
+                <p:column filterBy="#{customer.address}" sortBy="#{customer.address}" headerText="Address"
+                          footerText="contains"
+                          filterMatchMode="contains">
+                    <h:outputText value="#{customer.address}"/>
+                </p:column>
+                <p:column filterBy="#{customer.zip}" sortBy="#{customer.zip}" headerText="Zipcode"
+                          footerText="contains"
+                          filterMatchMode="contains">
+                    <h:outputText value="#{customer.zip}"/>
+                </p:column>
+                <p:column filterBy="#{customer.city}" sortBy="#{customer.city}" headerText="City"
+                          footerText="contains"
+                          filterMatchMode="contains">
+                    <h:outputText value="#{customer.city}"/>
+                </p:column>
+                <p:column filterBy="#{customer.status.name()}" sortBy="#{customer.status}"
+                          footerText="equals"
+                          filterMatchMode="equals"
+                          headerText="Status">
+
+                    <f:facet name="filter">
+                        <p:selectOneMenu label="Status" onchange="PF('customersTable').filter()"
+                                         panelStyle="width: 220px">
+                            <f:selectItem itemLabel="Select One" itemValue="#{null}" noSelectionOption="true"/>
+                            <f:selectItems value="#{dtFilterView.statuses}" var="status" itemValue="#{status.name()}"/>
+                        </p:selectOneMenu>
+                    </f:facet>
+
+                    <p:cellEditor>
+                        <f:facet name="output"> <h:outputText value="#{customer.status}"/></f:facet>
+                        <f:facet name="input">
+                            <h:selectOneMenu value="#{customer.status}" style="width:100%">
+                                <f:selectItems value="#{dtFilterView.statuses}"/>
+                            </h:selectOneMenu>
+                        </f:facet>
+                    </p:cellEditor>
+
+                </p:column>
+
+                <p:column sortBy="#{customer.created}" headerText="Created">
+                    <h:outputText value="#{customer.created}"/>
+                </p:column>
+
+                <p:column sortBy="#{customer.updated}" headerText="Updated">
+                    <h:outputText value="#{customer.updated}"/>
+                </p:column>
+
+            </p:dataTable>
+
+            <h2>Notes of selected customer:</h2>
+
+            <p:dataTable id="notes" var="note" value="#{dtFilterView.currentCustomersNotes}" widgetVar="notesTable"
+                         emptyMessage="No Notes found."
+                         scrollable="true" scrollHeight="200">
+
+                <p:column sortBy="#{note.id}" headerText="Id">
+                    <h:outputText value="#{note.id}"/>
+                </p:column>
+
+                <p:column filterBy="#{note.note}" sortBy="#{note.note}" headerText="Note"
+                          filterMatchMode="contains">
+                    <h:outputText value="#{note.note}"/>
+                </p:column>
+
+                <p:column sortBy="#{note.created}" headerText="Created">
+                    <h:outputText value="#{note.created}"/>
+                </p:column>
+
+                <p:column sortBy="#{note.updated}" headerText="Updated">
+                    <h:outputText value="#{note.updated}"/>
+                </p:column>
+
+                <p:column>
+                    <f:facet name="header">Actions</f:facet>
+                    <p:commandButton action="#{dtFilterView.deleteNoteById(note.id)}" value="Delete" update="@form"/>
+                    <p:commandButton value="Edit" oncomplete="PF('editNoteDlg').show();"
+                                     disabled="#{dtFilterView.currentCustomer==null}"
+                                     action="#{dtFilterView.selectNote(note)}" update=":editNoteDlg">
+                    </p:commandButton>
+                </p:column>
+
+                <f:facet name="footer">
+                    <p:commandButton value="New Note" oncomplete="PF('newNoteDlg').show();"
+                                     disabled="#{dtFilterView.currentCustomer==null}" update=":newNoteDlg"/>
+                </f:facet>
+
+            </p:dataTable>
+        </h:form>
+
+        <p:dialog id="newNoteDlg" header="New Note Dialog" widgetVar="newNoteDlg" modal="true" height="300" width="600">
+            <h:outputText value="Enter the text:"/>
+            <h:form>
+                <p:inputTextarea id="newForm" rows="5" cols="50" counter="display" maxlength="10000"
+                                 value="#{dtFilterView.currentNote}"
+                                 counterTemplate="{0} characters remaining." autoResize="false"/>
+                <br/>
+                <h:outputText id="display"/>
+                <p:commandButton value="Save" actionListener="#{dtFilterView.saveNewNoteButtonAction}"
+                                 oncomplete="PF('newNoteDlg').hide();" update=":form:notes"/>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog id="editNoteDlg" header="Edit Note Dialog" widgetVar="editNoteDlg" modal="true" height="300" width="600">
+            <h:outputText value="Edit the text:"/>
+            <h:form>
+                <p:inputTextarea rows="5" cols="50" counter="display1" maxlength="10000"
+                                 value="#{dtFilterView.currentNoteEntity.note}"
+                                 counterTemplate="{0} characters remaining." autoResize="false"/>
+                <br/>
+                <h:outputText id="display1"/>
+                <p:commandButton value="Update" actionListener="#{dtFilterView.updateNoteButtonAction}"
+                                 oncomplete="PF('editNoteDlg').hide();" update=":form:notes"/>
+            </h:form>
+        </p:dialog>
+
+    </ui:define>
+
+</ui:composition>
+
+</body>
+</html>
