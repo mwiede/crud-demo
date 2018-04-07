@@ -40,7 +40,7 @@ For a production ready application a few things could be desirable, but were not
 
 * Performance: for example if the data-set would be huge, it would make sense to use lazy data table, which loads the data in a page wise manner 
 instead of loading all data at once. Same holds good for the JAX-RS resource.
-* UI/design : nowadays web applications are consumed via different devices with different sizes of screens. Therefore a good approach would be response design, 
+* UI/design : nowadays web applications are consumed via different devices with different sizes of screens. Therefore a good approach would be responsive design, 
 which adapts the layout to the screen size.
 
 ## Deployment & Delivery
