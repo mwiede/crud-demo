@@ -10,7 +10,7 @@
             <!-- Properties for Hibernate -->
             <property name="hibernate.dialect" value="org.hibernate.dialect.MySQLDialect"/>
             <property name="hibernate.hbm2ddl.auto" value="create"/>
-            <property name="hibernate.show_sql" value="true"/>
+            <property name="hibernate.show_sql" value="${hibernate.show_sql}"/>
         </properties>
     </persistence-unit>
 </persistence>

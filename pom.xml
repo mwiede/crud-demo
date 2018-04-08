@@ -15,13 +15,8 @@
         <failOnMissingWebXml>false</failOnMissingWebXml>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <version.h2>1.4.187</version.h2>
+        <version.mysql>5.1.46</version.mysql>
 
-        <!-- persistence properties -->
-        <db.user>sa</db.user>
-        <db.password>sa</db.password>
-        <db.driver>h2</db.driver>
-        <db.url>jdbc:h2:~/kitchensink-angularjs-quickstart;Mode=MYSQL;DB_CLOSE_ON_EXIT=TRUE;DB_CLOSE_DELAY=-1
-        </db.url>
         <db.jndiName>java:jboss/datasources/ExampleDS</db.jndiName>
         <hibernate.show_sql>true</hibernate.show_sql>
     </properties>
@@ -99,12 +94,6 @@
         </dependency>
 
         <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
-            <version>${version.h2}</version>
-        </dependency>
-
-        <dependency>
             <groupId>org.primefaces</groupId>
             <artifactId>primefaces</artifactId>
             <version>6.1</version>
@@ -115,15 +104,33 @@
     <profiles>
 
         <profile>
+            <id>dev</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>com.h2database</groupId>
+                    <artifactId>h2</artifactId>
+                    <version>${version.h2}</version>
+                </dependency>
+            </dependencies>
+        </profile>
+
+        <profile>
             <id>openshift</id>
             <properties>
-                <db.user>${OPENSHIFT_MYSQL_DB_USERNAME}</db.user>
-                <db.password>${OPENSHIFT_MYSQL_DB_PASSWORD}</db.password>
-                <db.driver>mysql</db.driver>
-                <db.url>${OPENSHIFT_MYSQL_DB_URL}</db.url>
-                <db.jndiName>java:jboss/datasources/MySQLDS</db.jndiName>
                 <hibernate.show_sql>false</hibernate.show_sql>
             </properties>
+
+            <dependencies>
+                <dependency>
+                    <groupId>mysql</groupId>
+                    <artifactId>mysql-connector-java</artifactId>
+                    <version>${version.mysql}</version>
+                </dependency>
+            </dependencies>
+
         </profile>
 
         <profile>
@@ -152,7 +159,9 @@
                                             <inline>
                                                 <files>
                                                     <file>
-                                                        <source>${project.build.directory}/${project.artifactId}-swarm.jar</source>
+                                                        <source>
+                                                            ${project.build.directory}/${project.artifactId}-swarm.jar
+                                                        </source>
                                                         <outputDirectory>/opt</outputDirectory>
                                                     </file>
                                                 </files>
