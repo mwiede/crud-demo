@@ -15,7 +15,7 @@
         <failOnMissingWebXml>false</failOnMissingWebXml>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <version.h2>1.4.187</version.h2>
-        <version.mysql>5.1.46</version.mysql>
+        <version.mysql>8.0.16</version.mysql>
 
         <db.jndiName>java:jboss/datasources/ExampleDS</db.jndiName>
         <hibernate.show_sql>true</hibernate.show_sql>
